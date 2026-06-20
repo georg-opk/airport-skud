@@ -17,15 +17,14 @@ async def cv_identify(checkpoint_id: int, presented_id: int = None,
                       frame: UploadFile = File(...),
                       db: Session = Depends(get_db)):
     """POST /cv/identify — запрос идентификации и запись события."""
-    result = await identify_frame(frame, presented_id)  # вызов конвейера §3.4
+    result = await identify_frame(frame, presented_id)   # вызов конвейера §3.4
     event = AccessEvent(checkpoint_id=checkpoint_id,
                         employee_id=result.get("employee_id"),
                         result=result["decision"],
                         similarity_score=result["similarity"],
                         liveness_score=result["liveness_score"],
                         reason=result["reason"])
-    db.add(event);
-    db.commit()
+    db.add(event); db.commit()
     return result
 
 

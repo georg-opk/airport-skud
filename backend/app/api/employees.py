@@ -36,9 +36,7 @@ async def create_employee(full_name: str, position: str = "",
                           db: Session = Depends(get_db)):
     """POST /employees — регистрация сотрудника с фото."""
     emp = Employee(full_name=full_name, position=position)
-    db.add(emp);
-    db.commit();
-    db.refresh(emp)
+    db.add(emp); db.commit(); db.refresh(emp)
     try:
         embedding = await build_embedding_from_upload(photo)
         milvus.insert_embedding(emp.id, embedding)

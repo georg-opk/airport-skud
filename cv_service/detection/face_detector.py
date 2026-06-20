@@ -41,7 +41,7 @@ class FaceDetector:
                   for i, f in enumerate(faces)
                   if f.det_score >= self.conf_threshold]
         result.sort(key=lambda fi: (fi.bbox[2] - fi.bbox[0]) *
-                                   (fi.bbox[3] - fi.bbox[1]), reverse=True)
+                    (fi.bbox[3] - fi.bbox[1]), reverse=True)
         return result
 
     def align_face(self, frame: np.ndarray, face: FaceInfo) -> np.ndarray:

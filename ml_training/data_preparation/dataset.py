@@ -58,4 +58,3 @@ def create_dataloaders(train_df, val_df, test_df, batch_size: int = 64):
                    shuffle=False, num_workers=4),
         DataLoader(LivenessDataset(test_df, False), batch_size=batch_size,
                    shuffle=False, num_workers=4),
-    )

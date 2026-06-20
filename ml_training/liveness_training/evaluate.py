@@ -16,10 +16,10 @@ def evaluate_model(model, test_loader, device: str = "cuda",
             scores = model(images.to(device)).cpu().flatten()
             preds = (scores >= threshold).int()
             for pred, label in zip(preds, labels.int()):
-                if label == 0:  # атака
+                if label == 0:                     # атака
                     attack_total += 1
                     attack_err += int(pred == 1)
-                else:  # живой
+                else:                              # живой
                     bona_total += 1
                     bona_err += int(pred == 0)
     apcer = attack_err / attack_total if attack_total else 0.0

@@ -18,7 +18,7 @@ class LivenessModel(nn.Module):
         self.features = backbone.features
         self.pool = nn.AdaptiveAvgPool2d(1)
         self.classifier = nn.Sequential(
-            nn.Dropout(0.5),  # регуляризация
+            nn.Dropout(0.5),                       # регуляризация
             nn.Linear(backbone.last_channel, 1),
         )
         self._init_weights()

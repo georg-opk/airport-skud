@@ -6,7 +6,7 @@ from fastapi import APIRouter, WebSocket
 
 logger = logging.getLogger(__name__)
 ws_router = APIRouter()
-_clients: List[WebSocket] = []  # подключённые дашборды
+_clients: List[WebSocket] = []      # подключённые дашборды
 
 
 @ws_router.websocket("/ws/alerts")
@@ -18,7 +18,7 @@ async def alerts_socket(ws: WebSocket):
         while True:
             await ws.receive_text()  # поддержание соединения
     except Exception:
-        _clients.remove(ws)  # отключение клиента
+        _clients.remove(ws)          # отключение клиента
 
 
 async def broadcast_alert(alert: dict):

@@ -13,10 +13,10 @@ class DataAugmentor:
     def __init__(self, enabled: bool = True):
         self.enabled = enabled
         self.transform = T.Compose([
-            T.RandomRotation(degrees=15),  # поворот ±15°
+            T.RandomRotation(degrees=15),               # поворот ±15°
             T.ColorJitter(brightness=0.2, contrast=0.2),  # яркость/контраст
             T.RandomResizedCrop(112, scale=(0.85, 1.0)),  # случайный кроп
-            T.RandomHorizontalFlip(p=0.5),  # отражение
+            T.RandomHorizontalFlip(p=0.5),              # отражение
         ])
 
     def apply_augmentation(self, image: np.ndarray) -> np.ndarray:
@@ -29,7 +29,7 @@ class DataAugmentor:
         except Exception as exc:
             logger.error("Ошибка аугментации: %s", exc)
             return image
-        if random.random() < 0.5:  # гауссов шум
+        if random.random() < 0.5:                       # гауссов шум
             noise = np.random.normal(0, 0.02, augmented.shape).astype(np.float32)
             augmented = np.clip(augmented + noise, 0.0, 1.0)
         return augmented

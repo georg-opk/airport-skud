@@ -4,8 +4,8 @@ from pathlib import Path
 import pandas as pd
 
 logger = logging.getLogger(__name__)
-LABEL_BONAFIDE = 0  # метка живого лица
-LABEL_ATTACK = 1  # метка атаки
+LABEL_BONAFIDE = 0   # метка живого лица
+LABEL_ATTACK = 1     # метка атаки
 
 
 def load_celeba_spoof(dataset_path: str) -> pd.DataFrame:

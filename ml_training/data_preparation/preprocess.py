@@ -26,7 +26,7 @@ def preprocess_image(image_path: str):
     if not faces:
         return None
     face = max(faces, key=lambda f: (f.bbox[2] - f.bbox[0]) *
-                                    (f.bbox[3] - f.bbox[1]))
+               (f.bbox[3] - f.bbox[1]))
     aligned = face_align.norm_crop(img, landmark=face.kps, image_size=FACE_SIZE)
     aligned = cv2.cvtColor(aligned, cv2.COLOR_BGR2RGB).astype(np.float32) / 255.0
     return (aligned - IMAGENET_MEAN) / IMAGENET_STD
@@ -44,7 +44,7 @@ def preprocess_dataset(input_dir: str, output_dir: str) -> int:
             if arr is None:
                 continue
             np.save(os.path.join(output_dir,
-                                 os.path.splitext(name)[0] + ".npy"), arr)
+                    os.path.splitext(name)[0] + ".npy"), arr)
             count += 1
     logger.info("Предобработано: %d", count)
     return count

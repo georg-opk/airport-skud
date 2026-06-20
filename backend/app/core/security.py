@@ -9,9 +9,9 @@ from passlib.context import CryptContext
 
 logger = logging.getLogger(__name__)
 
-SECRET_KEY = "CHANGE_ME"  # ключ из защищённого хранилища
+SECRET_KEY = "CHANGE_ME"            # ключ из защищённого хранилища
 ALGORITHM = "HS256"
-ACCESS_TTL_MIN = 15  # время жизни access-токена (§2.10)
+ACCESS_TTL_MIN = 15                 # время жизни access-токена (§2.10)
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
 

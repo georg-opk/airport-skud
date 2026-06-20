@@ -13,7 +13,7 @@ def train_model(model, train_loader, val_loader, epochs: int = 30,
                 lr: float = 1e-4, device: str = "cuda"):
     """Обучение с сохранением лучшей модели по валидации."""
     model = model.to(device)
-    criterion = nn.BCELoss()  # бинарная кросс-энтропия
+    criterion = nn.BCELoss()                       # бинарная кросс-энтропия
     optimizer = Adam(model.parameters(), lr=lr, weight_decay=1e-5)
     scheduler = CosineAnnealingLR(optimizer, T_max=epochs)
     best_acc, best_state = 0.0, copy.deepcopy(model.state_dict())

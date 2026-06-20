@@ -34,7 +34,7 @@ class AccessEvent(Base):
     event_time = Column(DateTime, server_default=func.now(), index=True)
     checkpoint_id = Column(Integer)
     employee_id = Column(Integer, index=True)
-    result = Column(String(20))  # допуск / отказ / атака
+    result = Column(String(20))          # допуск / отказ / атака
     similarity_score = Column(Float)
     liveness_score = Column(Float)
     reason = Column(String)
