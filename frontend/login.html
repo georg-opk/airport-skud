@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<!-- Страница входа оператора СКУД. Файл: frontend/login.html -->
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>СКУД — Вход в систему</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <style>
+    /* Стили специально для страницы входа */
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #3a4a63 0%, #1e2a3a 100%);
+      margin: 0;
+    }
+    .login-container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 40px;
+      width: 100%;
+      max-width: 380px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    .login-container h1 {
+      text-align: center;
+      color: #3a4a63;
+      margin-bottom: 8px;
+      font-size: 22px;
+    }
+    .login-container .subtitle {
+      text-align: center;
+      color: #6b7a8f;
+      margin-bottom: 28px;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    .form-group label {
+      display: block;
+      margin-bottom: 6px;
+      color: #3a4a63;
+      font-size: 13px;
+      font-weight: 600;
+    }
+    .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #cdd6e2;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus {
+      outline: none;
+      border-color: #3a4a63;
+    }
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: #3a4a63;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      margin-top: 8px;
+    }
+    .login-btn:hover {
+      background: #2c3a4f;
+    }
+    .login-btn:disabled {
+      background: #a0aab8;
+      cursor: not-allowed;
+    }
+    .error-message {
+      background: #fbeaea;
+      color: #b5443a;
+      border: 1px solid #b5443a;
+      border-radius: 6px;
+      padding: 10px;
+      margin-bottom: 16px;
+      font-size: 13px;
+      display: none;
+    }
+    .footer-note {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #8a96a6;
+    }
+  </style>
+</head>
+<body>
+  <div class="login-container">
+    <h1>✈️ СКУД Аэропорт</h1>
+    <p class="subtitle">Вход в систему оператора</p>
+
+    <div id="error-box" class="error-message"></div>
+
+    <form id="login-form">
+      <div class="form-group">
+        <label for="username">Логин</label>
+        <input
+          type="text"
+          id="username"
+          name="username"
+          placeholder="Введите логин"
+          autocomplete="username"
+          required
+        >
+      </div>
+
+      <div class="form-group">
+        <label for="password">Пароль</label>
+        <input
+          type="password"
+          id="password"
+          name="password"
+          placeholder="Введите пароль"
+          autocomplete="current-password"
+          required
+        >
+      </div>
+
+      <button type="submit" class="login-btn" id="submit-btn">Войти</button>
+    </form>
+
+    <p class="footer-note">© 2026 МАИ · Цифровая кафедра</p>
+  </div>
+
+  <script>
+    // Логика страницы входа
+    const BASE_URL = "http://localhost:8000/api/v1";
+
+    const form = document.getElementById("login-form");
+    const errorBox = document.getElementById("error-box");
+    const submitBtn = document.getElementById("submit-btn");
+
+    // Если токен уже есть — сразу редирект на дашборд
+    if (localStorage.getItem("token")) {
+      window.location.href = "index.html";
+    }
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      errorBox.style.display = "none";
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (!username || !password) {
+        showError("Заполните все поля");
+        return;
+      }
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Вход...";
+
+      try {
+        const response = await fetch(BASE_URL + "/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username, password })
+        });
+
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.detail || "Неверный логин или пароль");
+        }
+
+        const data = await response.json();
+        localStorage.setItem("token", data.access_token);
+        localStorage.setItem("username", username);
+
+        // Переход на дашборд
+        window.location.href = "index.html";
+      } catch (err) {
+        showError(err.message || "Ошибка соединения с сервером");
+      } finally {
+        submitBtn.disabled = false;
+        submitBtn.textContent = "Войти";
+      }
+    });
+
+    function showError(msg) {
+      errorBox.textContent = msg;
+      errorBox.style.display = "block";
+    }
+  </script>
+</body>
+</html>

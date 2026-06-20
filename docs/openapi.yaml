@@ -1,0 +1,99 @@
+openapi: 3.0.3
+info:
+  title: СКУД аэропорта — REST API
+  version: "1.0"
+  description: API системы контроля и управления доступом (§2.8)
+servers:
+  - url: http://localhost:8000/api/v1
+components:
+  securitySchemes:
+    bearerAuth: { type: http, scheme: bearer, bearerFormat: JWT }
+  schemas:
+    EmployeeCreate:
+      type: object
+      required: [full_name]
+      properties:
+        full_name: { type: string }
+        position:  { type: string }
+        department: { type: string }
+    EmployeeResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        full_name: { type: string }
+        position: { type: string }
+        status: { type: string }
+        created_at: { type: string, format: date-time }
+    AccessEventResponse:
+      type: object
+      properties:
+        id: { type: integer }
+        event_time: { type: string, format: date-time }
+        checkpoint_name: { type: string }
+        employee_name: { type: string }
+        result: { type: string }
+        similarity_score: { type: number }
+        liveness_score: { type: number }
+    LoginRequest:
+      type: object
+      required: [username, password]
+      properties:
+        username: { type: string }
+        password: { type: string }
+    TokenResponse:
+      type: object
+      properties:
+        access_token: { type: string }
+        token_type: { type: string }
+        expires_in: { type: integer }
+    IdentifyResponse:
+      type: object
+      properties:
+        employee_id: { type: integer }
+        similarity: { type: number }
+        liveness_score: { type: number }
+        decision: { type: string }
+security:
+  - bearerAuth: []
+paths:
+  /employees:
+    get:    { summary: Список сотрудников, responses: { "200": { description: OK } } }
+    post:   { summary: Регистрация сотрудника,
+              responses: { "201": { description: Created },
+                           "400": { description: Bad Request } } }
+  /employees/{id}:
+    get:    { summary: Детали сотрудника,
+              responses: { "200": { description: OK },
+                           "404": { description: Not Found } } }
+    put:    { summary: Обновление данных, responses: { "200": { description: OK } } }
+    delete: { summary: Логическое увольнение, responses: { "200": { description: OK } } }
+  /passes:
+    get:    { summary: Список пропусков, responses: { "200": { description: OK } } }
+    post:   { summary: Выдача пропуска, responses: { "201": { description: Created } } }
+  /passes/{id}/status:
+    put:    { summary: Изменение статуса пропуска,
+              responses: { "200": { description: OK } } }
+  /events:
+    get:    { summary: Журнал событий, responses: { "200": { description: OK } } }
+  /events/stats:
+    get:    { summary: Статистика событий, responses: { "200": { description: OK } } }
+  /zones:
+    get:    { summary: Список зон, responses: { "200": { description: OK } } }
+    post:   { summary: Создание зоны, responses: { "201": { description: Created } } }
+  /blacklist:
+    get:    { summary: Чёрный список, responses: { "200": { description: OK } } }
+    post:   { summary: Добавление в чёрный список,
+              responses: { "201": { description: Created } } }
+  /blacklist/{id}:
+    delete: { summary: Удаление из чёрного списка,
+              responses: { "200": { description: OK } } }
+  /auth/login:
+    post:   { summary: Получение JWT-токена,
+              responses: { "200": { description: OK },
+                           "401": { description: Unauthorized } } }
+  /auth/refresh:
+    post:   { summary: Обновление токена, responses: { "200": { description: OK } } }
+  /cv/identify:
+    post:   { summary: Запрос идентификации, responses: { "200": { description: OK } } }
+  /cv/status:
+    get:    { summary: Статус CV-сервиса, responses: { "200": { description: OK } } }

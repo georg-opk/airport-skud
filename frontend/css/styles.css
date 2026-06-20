@@ -1,0 +1,19 @@
+/* Стили дашборда. Файл: frontend/css/styles.css */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: Arial, sans-serif; background: #f4f6f9; color: #23303f; }
+.header { display: flex; justify-content: space-between;
+  align-items: center; padding: 12px 20px; background: #3a4a63; color: #fff; }
+.layout { display: grid; gap: 16px; padding: 16px;
+  grid-template-columns: 2fr 1fr; }
+.cards { grid-column: 1 / -1; display: flex; gap: 16px; }
+.card { flex: 1; padding: 16px; border-radius: 8px;
+  border: 1px solid #cdd6e2; background: #fff; }
+.card.ok     { border-color: #4ea72e; }   /* допуск  — зелёный */
+.card.warn   { border-color: #b5793a; }   /* отказ   — жёлтый  */
+.card.danger { border-color: #b5443a; }   /* атака   — красный */
+.row-grant  { background: #eef7ee; }
+.row-reject { background: #fdf2e3; }
+.row-attack { background: #fbeaea; }
+.alerts { background: #fff5f5; border: 1px solid #b5443a;
+  border-radius: 8px; padding: 12px; }
+@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
