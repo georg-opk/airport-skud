@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<!-- Главный экран дашборда (§2.9). Файл: frontend/index.html -->
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>СКУД — Дашборд оператора</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <header class="header">
+    <h1>СКУД — Дашборд оператора</h1>
+    <div class="user"><span id="username"></span>
+      <button id="logout">Выход</button></div>
+  </header>
+  <main class="layout">
+    <section class="cards">
+      <div class="card ok"><span>Проходов сегодня</span>
+        <strong id="stat-pass">0</strong></div>
+      <div class="card warn"><span>Отказов</span>
+        <strong id="stat-reject">0</strong></div>
+      <div class="card danger"><span>Атак</span>
+        <strong id="stat-attack">0</strong></div>
+    </section>
+    <section class="chart"><canvas id="loadChart"></canvas></section>
+    <aside id="alerts" class="alerts"><h2>Активные алерты</h2></aside>
+    <section class="events">
+      <h2>Последние события доступа</h2>
+      <table><thead><tr>
+        <th>Время</th><th>КПП</th><th>Сотрудник</th>
+        <th>Результат</th><th>Сходство</th>
+      </tr></thead><tbody id="events-body"></tbody></table>
+    </section>
+  </main>
+  <script src="js/api.js"></script>
+  <script src="js/websocket.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
