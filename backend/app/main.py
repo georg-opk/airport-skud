@@ -1,8 +1,12 @@
 """Точка входа серверной части (FastAPI). Файл: backend/app/main.py"""
 import logging
 import time
+from contextlib import asynccontextmanager
+from pathlib import Path
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 from app.api import employees, events, cv, auth, websocket
 from app.db.database import init_db
@@ -10,17 +14,38 @@ from app.db.database import init_db
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="СКУД аэропорта", version="1.0",
-              description="REST API системы контроля доступа (§2.8)")
+# Путь к папке фронтенда (на уровень выше backend/)
+FRONTEND_DIR = Path(__file__).resolve().parent.parent.parent / "frontend"
 
-# CORS: разрешаем запросы с дашборда оператора
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["*"],
-                   allow_headers=["*"], allow_credentials=True)
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Современный способ инициализации ресурсов (вместо on_event)."""
+    init_db()
+    logger.info("Приложение запущено")
+    yield
+    logger.info("Приложение остановлено")
+
+
+app = FastAPI(
+    title="СКУД аэропорта",
+    version="1.0",
+    description="REST API системы контроля доступа (§2.8)",
+    lifespan=lifespan,
+)
+
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+    allow_credentials=False,
+)
 
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    """Middleware логирования времени обработки запросов."""
     start = time.time()
     response = await call_next(request)
     logger.info("%s %s -> %d (%.1f мс)", request.method, request.url.path,
@@ -28,20 +53,36 @@ async def log_requests(request: Request, call_next):
     return response
 
 
-@app.on_event("startup")
-async def on_startup():
-    """Инициализация ресурсов при запуске (БД, Milvus)."""
-    init_db()
-    logger.info("Приложение запущено")
-
-
-@app.on_event("shutdown")
-async def on_shutdown():
-    """Освобождение ресурсов при остановке."""
-    logger.info("Приложение остановлено")
-
-
-# Регистрация маршрутов с префиксом /api/v1
+# API-маршруты ( ДО статических файлов!)
 for router in (auth.router, employees.router, events.router,
                cv.router, websocket.ws_router):
     app.include_router(router, prefix="/api/v1")
+
+
+# Корень — редирект на страницу входа
+@app.get("/")
+def root():
+    return FileResponse(FRONTEND_DIR / "login.html")
+
+
+# Раздача статики — ПОСЛЕ всех API-роутов
+app.mount("/", StaticFiles(directory=FRONTEND_DIR, html=True), name="frontend")
+
+
+# ===== Запуск сервера =====
+if __name__ == "__main__":
+    import uvicorn
+
+    print("\n" + "=" * 50)
+    print("Запуск СКУД API...")
+    print("=" * 50)
+    print("Вход:       http://localhost:8000/login.html")
+    print("Swagger UI: http://localhost:8000/docs")
+    print("=" * 50 + "\n")
+
+    uvicorn.run(
+        "app.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True
+    )

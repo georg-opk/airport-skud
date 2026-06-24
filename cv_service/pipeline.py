@@ -8,7 +8,6 @@ import numpy as np
 
 from detection.face_detector import FaceDetector
 from recognition.face_recognizer import FaceRecognizer
-from liveness.liveness_detector import LivenessDetector
 from config import Config
 
 logger = logging.getLogger(__name__)
@@ -31,7 +30,7 @@ class BiometricPipeline:
     def __init__(self, detector, recognizer, liveness_detector, milvus_client):
         self.detector = detector
         self.recognizer = recognizer
-        self.liveness = liveness_detector
+        self.liveness = liveness_detector  # может быть None
         self.milvus = milvus_client
 
     def process(self, frame: np.ndarray,
@@ -42,10 +41,15 @@ class BiometricPipeline:
         if not faces:
             return self._reject("no_face", start)
         aligned = self.detector.align_face(frame, faces[0])
-        # проверка живости ДО построения эмбеддинга
-        liveness_score = self.liveness.check_liveness(aligned)
-        if liveness_score < Config.LIVENESS_THRESHOLD:
-            return self._reject("attack", start, liveness=liveness_score)
+
+        # проверка живости — только если детектор подключен
+        if self.liveness is not None:
+            liveness_score = self.liveness.check_liveness(aligned)
+            if liveness_score < Config.LIVENESS_THRESHOLD:
+                return self._reject("attack", start, liveness=liveness_score)
+        else:
+            liveness_score = 1.0  # без модели считаем живым
+
         embedding = self.recognizer.get_embedding(aligned)
         if presented_id is not None:
             employee_id, similarity = self._verify_1to1(embedding, presented_id)

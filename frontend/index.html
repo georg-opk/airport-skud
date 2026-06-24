@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-<!-- Главный экран дашборда (§2.9). Файл: frontend/index.html -->
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
@@ -11,30 +10,77 @@
 <body>
   <header class="header">
     <h1>СКУД — Дашборд оператора</h1>
-    <div class="user"><span id="username"></span>
-      <button id="logout">Выход</button></div>
+    <div class="user">
+      <span id="username"></span>
+      <button id="logout">Выход</button>
+    </div>
   </header>
   <main class="layout">
     <section class="cards">
-      <div class="card ok"><span>Проходов сегодня</span>
-        <strong id="stat-pass">0</strong></div>
-      <div class="card warn"><span>Отказов</span>
-        <strong id="stat-reject">0</strong></div>
-      <div class="card danger"><span>Атак</span>
-        <strong id="stat-attack">0</strong></div>
+      <div class="card ok">
+        <span>Проходов сегодня</span>
+        <strong id="stat-pass">0</strong>
+      </div>
+      <div class="card warn">
+        <span>Отказов</span>
+        <strong id="stat-reject">0</strong>
+      </div>
+      <div class="card danger">
+        <span>Атак</span>
+        <strong id="stat-attack">0</strong>
+      </div>
     </section>
     <section class="chart"><canvas id="loadChart"></canvas></section>
     <aside id="alerts" class="alerts"><h2>Активные алерты</h2></aside>
-    <section class="events">
-      <h2>Последние события доступа</h2>
-      <table><thead><tr>
-        <th>Время</th><th>КПП</th><th>Сотрудник</th>
-        <th>Результат</th><th>Сходство</th>
-      </tr></thead><tbody id="events-body"></tbody></table>
+
+    <!-- Камера слева (уже) -->
+    <section id="camera-section" class="camera-section">
+      <h2>Идентификация с камеры</h2>
+      <div class="camera-wrap">
+        <video id="camera-video" autoplay playsinline muted></video>
+        <canvas id="capture-canvas" style="display:none;"></canvas>
+      </div>
+      <div class="camera-controls">
+        <button id="btn-start-camera">Включить камеру</button>
+        <button id="btn-identify">Снимок</button>
+        <button id="btn-auto">Автозахват</button>
+        <button id="btn-stop-camera">Стоп</button>
+        <span id="verify-spinner" class="spinner" style="display:none;"></span>
+        <span id="verify-status" class="verify-status"></span>
+      </div>
+      <div id="verify-result" class="verify-result"></div>
+    </section>
+
+    <!-- Логи справа — расширенные, с КПП и сходством -->
+    <section id="logs-section" class="logs-section">
+      <h2>
+        Журнал идентификаций
+        <span class="log-count" id="log-count">0 записей</span>
+      </h2>
+      <div class="logs-scroll">
+        <table class="logs-table">
+          <thead>
+            <tr>
+              <th>Время</th>
+              <th>КПП</th>
+              <th>Результат</th>
+              <th>Сотрудник</th>
+              <th>Сходство</th>
+              <th>Живость</th>
+              <th>Причина</th>
+            </tr>
+          </thead>
+          <tbody id="verify-log-body">
+            <tr><td colspan="7" class="logs-empty">Записей пока нет</td></tr>
+          </tbody>
+        </table>
+      </div>
     </section>
   </main>
+
   <script src="js/api.js"></script>
   <script src="js/websocket.js"></script>
+  <script src="js/camera-verify.js"></script>
   <script src="js/app.js"></script>
 </body>
 </html>

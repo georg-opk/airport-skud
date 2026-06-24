@@ -1,19 +1,97 @@
-/* Стили дашборда. Файл: frontend/css/styles.css */
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: Arial, sans-serif; background: #f4f6f9; color: #23303f; }
+
+/* ─── Верхняя панель ─── */
 .header { display: flex; justify-content: space-between;
   align-items: center; padding: 12px 20px; background: #3a4a63; color: #fff; }
+.header h1 { font-size: 20px; }
+.header .user { display: flex; align-items: center; gap: 14px; }
+.header .user #username { font-size: 14px; opacity: 0.9; }
+.header .user button {
+  padding: 8px 18px; border: 1px solid rgba(255,255,255,0.4);
+  border-radius: 6px; background: #2c3a4f; color: #fff;
+  font-size: 14px; cursor: pointer; transition: background 0.15s, border-color 0.15s; }
+.header .user button:hover { background: #1f2a3a; border-color: #fff; }
+
+/* ─── Сетка ─── */
 .layout { display: grid; gap: 16px; padding: 16px;
-  grid-template-columns: 2fr 1fr; }
+  grid-template-columns: 1fr 2fr; align-items: start; }
 .cards { grid-column: 1 / -1; display: flex; gap: 16px; }
 .card { flex: 1; padding: 16px; border-radius: 8px;
-  border: 1px solid #cdd6e2; background: #fff; }
-.card.ok     { border-color: #4ea72e; }   /* допуск  — зелёный */
-.card.warn   { border-color: #b5793a; }   /* отказ   — жёлтый  */
-.card.danger { border-color: #b5443a; }   /* атака   — красный */
-.row-grant  { background: #eef7ee; }
-.row-reject { background: #fdf2e3; }
-.row-attack { background: #fbeaea; }
-.alerts { background: #fff5f5; border: 1px solid #b5443a;
+  border: 1px solid #cdd6e2; background: #fff;
+  display: flex; flex-direction: column; gap: 6px; }
+.card span { font-size: 14px; color: #5b6b7e; }
+.card strong { font-size: 30px; }
+.card.ok     { border-color: #4ea72e; }
+.card.warn   { border-color: #b5793a; }
+.card.danger { border-color: #b5443a; }
+
+.chart { grid-column: 1 / -1; background: #fff; border: 1px solid #cdd6e2;
   border-radius: 8px; padding: 12px; }
-@media (max-width: 900px) { .layout { grid-template-columns: 1fr; } }
+.alerts { grid-column: 1 / -1; background: #fff5f5; border: 1px solid #b5443a;
+  border-radius: 8px; padding: 12px; }
+.alert-card { padding: 8px 10px; margin-top: 8px; border-radius: 6px;
+  background: #fdeaea; cursor: pointer; font-size: 14px; }
+.alert-card:hover { background: #fbdada; }
+
+/* ─── Камера — левая узкая колонка ─── */
+.camera-section {
+  grid-column: 1; grid-row: 4;
+  background: #fff; border: 1px solid #cdd6e2;
+  border-radius: 8px; padding: 16px; }
+.camera-section h2 { font-size: 15px; margin-bottom: 8px; }
+.camera-wrap { position: relative; }
+#camera-video { width: 100%; aspect-ratio: 4/3;
+  border-radius: 6px; background: #000; display: block; }
+.camera-controls { display: flex; gap: 6px; flex-wrap: wrap;
+  margin: 8px 0; align-items: center; }
+.camera-controls button { padding: 6px 10px; border: none;
+  border-radius: 5px; background: #3a4a63; color: #fff; cursor: pointer;
+  font-size: 12px; }
+.camera-controls button:hover { background: #2c3a4f; }
+
+.verify-result { margin-top: 8px; padding: 10px; border-radius: 6px;
+  font-size: 14px; font-weight: bold; text-align: center; }
+.verify-result.grant  { background: #e8f6e8; color: #2e7d32; }
+.verify-result.reject { background: #fdeaea; color: #b5443a; }
+.verify-result.attack { background: #fff0e0; color: #b5443a; }
+.verify-status { font-size: 12px; color: #6b7d96; margin-left: 4px; }
+.verify-status.danger { color: #b5443a; }
+.verify-status.ok     { color: #2e7d32; }
+
+/* ─── Логи — правая широкая колонка ─── */
+.logs-section {
+  grid-column: 2; grid-row: 4;
+  background: #fff; border: 1px solid #cdd6e2;
+  border-radius: 8px; padding: 16px;
+  display: flex; flex-direction: column; height: 580px; }
+.logs-section h2 { font-size: 15px; margin-bottom: 8px;
+  display: flex; justify-content: space-between; align-items: center; }
+.logs-section h2 .log-count { font-size: 12px; font-weight: normal; color: #5b6b7e; }
+
+.logs-scroll { flex: 1; overflow-y: auto;
+  border: 1px solid #eef1f5; border-radius: 6px; }
+.logs-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.logs-table thead th { position: sticky; top: 0;
+  background: #3a4a63; color: #fff; padding: 7px 8px;
+  text-align: left; font-weight: normal; z-index: 1; white-space: nowrap; }
+.logs-table tbody td { padding: 6px 8px;
+  border-bottom: 1px solid #eef1f5; vertical-align: top; }
+.logs-table tbody tr:nth-child(even) { background: #f7f9fc; }
+.log-grant  { color: #2e7d32; font-weight: bold; }
+.log-reject { color: #b5793a; font-weight: bold; }
+.log-attack { color: #b5443a; font-weight: bold; }
+.logs-empty { padding: 20px; text-align: center; color: #98a4b3; font-size: 13px; }
+
+/* ─── Спиннер ─── */
+.spinner { width: 16px; height: 16px; border: 3px solid #cdd6e2;
+  border-top-color: #3a4a63; border-radius: 50%;
+  display: inline-block; animation: spin 0.8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ─── Адаптив ─── */
+@media (max-width: 900px) {
+  .layout { grid-template-columns: 1fr; }
+  .camera-section, .logs-section { grid-column: 1; grid-row: auto; }
+  .logs-section { height: 400px; }
+}

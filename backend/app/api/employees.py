@@ -12,7 +12,16 @@ from app.services.cv_client import build_embedding_from_upload
 
 logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/employees", tags=["employees"])
-milvus = MilvusClient()
+
+_milvus = None
+
+
+def get_milvus():
+    """Ленивая инициализация Milvus (не при импорте модуля)."""
+    global _milvus
+    if _milvus is None:
+        _milvus = MilvusClient()
+    return _milvus
 
 
 @router.get("", response_model=list[EmployeeResponse])
@@ -39,7 +48,7 @@ async def create_employee(full_name: str, position: str = "",
     db.add(emp); db.commit(); db.refresh(emp)
     try:
         embedding = await build_embedding_from_upload(photo)
-        milvus.insert_embedding(emp.id, embedding)
+        get_milvus().insert_embedding(emp.id, embedding)
     except Exception as exc:
         logger.error("Ошибка построения эмбеддинга: %s", exc)
         raise HTTPException(status_code=400, detail="Ошибка обработки фото")
@@ -54,5 +63,6 @@ def delete_employee(emp_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Сотрудник не найден")
     emp.status = "уволен"
     db.commit()
-    milvus.delete_embedding(emp_id)
+    get_milvus().delete_embedding(emp_id)
     return {"status": "ok"}
+

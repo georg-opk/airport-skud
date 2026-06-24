@@ -16,15 +16,22 @@ router = APIRouter(tags=["cv"])
 async def cv_identify(checkpoint_id: int, presented_id: int = None,
                       frame: UploadFile = File(...),
                       db: Session = Depends(get_db)):
-    """POST /cv/identify — запрос идентификации и запись события."""
+    """POST /cv/identify — идентификация по кадру и запись события."""
     result = await identify_frame(frame, presented_id)   # вызов конвейера §3.4
-    event = AccessEvent(checkpoint_id=checkpoint_id,
-                        employee_id=result.get("employee_id"),
-                        result=result["decision"],
-                        similarity_score=result["similarity"],
-                        liveness_score=result["liveness_score"],
-                        reason=result["reason"])
-    db.add(event); db.commit()
+    try:
+        event = AccessEvent(
+            checkpoint_id=checkpoint_id,
+            employee_id=result.get("employee_id"),
+            result=result.get("decision", "reject"),
+            similarity_score=result.get("similarity", 0.0),
+            liveness_score=result.get("liveness_score", 0.0),
+            reason=result.get("reason", ""),
+        )
+        db.add(event)
+        db.commit()
+    except Exception as exc:  # noqa: BLE001
+        db.rollback()
+        logger.error("Не удалось записать событие доступа: %s", exc)
     return result
 
 
@@ -32,3 +39,4 @@ async def cv_identify(checkpoint_id: int, presented_id: int = None,
 def cv_status():
     """GET /cv/status — статус CV-сервиса."""
     return {"status": "ok"}
+
